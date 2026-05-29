@@ -1,0 +1,112 @@
+# ==================== OS generated files ====================
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+*.tmp
+
+# ==================== Claude Code ====================
+.claude/
+
+# ==================== IDE / Editor ====================
+# VS Code
+.vscode/
+
+# JetBrains (IntelliJ, PyCharm, WebStorm, etc.)
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+.idea_modules/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim / Neovim
+*.swp
+*.swo
+*~
+tags
+
+# Emacs
+*~
+\#*\#
+.#*
+
+# ==================== Windows ====================
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.exe
+*.dll
+*.sys
+
+# ==================== Node.js ====================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npn/
+package-lock.json
+yarn.lock
+.pnpm-store/
+
+# ==================== Python ====================
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*.egg
+dist/
+build/
+.eggs/
+*.whl
+.venv/
+venv/
+env/
+.env
+.python-version
+
+# ==================== Java ====================
+*.class
+*.jar
+*.war
+*.ear
+*.log
+target/
+.gradle/
+gradle/
+
+# ==================== C / C++ ====================
+*.o
+*.obj
+*.so
+*.dylib
+*.a
+*.lib
+*.exe
+*.out
+
+# ==================== Go ====================
+/bin/
+/pkg/
+
+# ==================== Rust ====================
+/target/
+Cargo.lock
+
+# ==================== Misc ====================
+*.log
+*.bak
+*.swp
+*.cache
+.DS_Store
+.env.local
+.env.*.local

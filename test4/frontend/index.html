@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能问诊助手</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.7.9/dist/axios.min.js"></script>
+</head>
+<body>
+    <div class="chat-container">
+        <header class="chat-header">
+            <div class="header-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                </svg>
+            </div>
+            <div class="header-text">
+                <h1>智能问诊助手</h1>
+                <p>AI 驱动的健康咨询 · 仅供参考，不替代专业医疗</p>
+            </div>
+        </header>
+
+        <!-- Tab Bar -->
+        <div class="tab-bar">
+            <button class="tab-btn active" onclick="switchTab('chat')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+                AI 问诊
+            </button>
+            <button class="tab-btn" onclick="switchTab('report')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
+                </svg>
+                体检报告分析
+            </button>
+        </div>
+
+        <!-- Chat Panel -->
+        <div class="panel active" id="chatPanel">
+            <div class="chat-messages" id="chatMessages">
+                <div class="welcome-message">
+                    <div class="welcome-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M12 2a7 7 0 0 1 7 7c0 5-7 11-7 11S5 14 5 9a7 7 0 0 1 7-7z"/>
+                            <circle cx="12" cy="9" r="2.5"/>
+                        </svg>
+                    </div>
+                    <h2>欢迎使用智能问诊助手</h2>
+                    <p>请描述您的症状，我将为您提供初步的健康建议。</p>
+                    <div class="quick-topics">
+                        <button class="topic-btn" onclick="sendQuickMessage('我最近经常头痛，是怎么回事？')">经常头痛</button>
+                        <button class="topic-btn" onclick="sendQuickMessage('我感冒了好几天了，一直不好，怎么办？')">感冒不愈</button>
+                        <button class="topic-btn" onclick="sendQuickMessage('我最近睡眠质量很差，总是失眠，有什么建议？')">失眠困扰</button>
+                        <button class="topic-btn" onclick="sendQuickMessage('我经常胃痛，特别是吃完饭之后，是什么原因？')">饭后胃痛</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-input-area">
+                <div class="input-wrapper">
+                    <textarea
+                        id="messageInput"
+                        placeholder="请描述您的症状..."
+                        rows="1"
+                        onkeydown="handleKeyDown(event)"
+                        oninput="autoResize(this)"
+                    ></textarea>
+                    <button id="sendBtn" class="send-btn" onclick="sendMessage()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="22" y1="2" x2="11" y2="13"/>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                        </svg>
+                    </button>
+                </div>
+                <p class="disclaimer">本助手提供的建议仅供参考，不能替代专业医生的诊断和治疗。如有紧急情况，请立即就医。</p>
+            </div>
+        </div>
+
+        <!-- Report Panel -->
+        <div class="panel" id="reportPanel">
+            <!-- Upload Area -->
+            <div class="report-upload-area" id="uploadArea">
+                <div class="upload-zone" id="uploadZone"
+                     onclick="document.getElementById('pdfInput').click()"
+                     ondragover="handleDragOver(event)"
+                     ondragleave="handleDragLeave(event)"
+                     ondrop="handleDrop(event)">
+                    <div class="upload-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                        </svg>
+                    </div>
+                    <h3>上传体检报告</h3>
+                    <p>点击或拖拽 PDF 文件到此处</p>
+                    <span class="upload-hint">支持 PDF 格式体检报告</span>
+                    <input type="file" id="pdfInput" accept=".pdf" hidden onchange="handleFileSelect(event)">
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div class="report-loading" id="reportLoading" style="display:none;">
+                <div class="loading-spinner"></div>
+                <h3>正在分析体检报告...</h3>
+                <p>AI 正在解读您的体检数据，请稍候</p>
+            </div>
+
+            <!-- Analysis Result -->
+            <div class="report-result" id="reportResult" style="display:none;">
+                <div class="report-header-bar">
+                    <h2>体检报告分析结果</h2>
+                    <button class="download-btn" onclick="downloadReport()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        下载分析报告
+                    </button>
+                </div>
+
+                <!-- Summary -->
+                <div class="report-summary" id="reportSummary"></div>
+
+                <!-- Abnormalities -->
+                <div class="abnormal-section">
+                    <h3>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                            <line x1="12" y1="9" x2="12" y2="13"/>
+                            <line x1="12" y1="17" x2="12.01" y2="17"/>
+                        </svg>
+                        异常指标详情
+                    </h3>
+                    <div class="abnormal-list" id="abnormalList"></div>
+                </div>
+
+                <!-- Overall -->
+                <div class="report-overall" id="reportOverall"></div>
+
+                <!-- Re-upload -->
+                <button class="reupload-btn" onclick="resetReport()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="1 4 1 10 7 10"/>
+                        <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+                    </svg>
+                    重新上传
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
